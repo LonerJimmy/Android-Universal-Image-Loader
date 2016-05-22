@@ -18,6 +18,8 @@ import java.util.Map;
  *
  * @author Sergey Tarasevich (nostra13[at]gmail[dot]com)
  * @since 1.8.1
+ *
+ * 一个限制数量的强引用bitmap的缓存.图片进来先放到队列的头部,当图片添加到存满的缓存中,队列尾部的会被移除.
  */
 public class LruMemoryCache implements MemoryCache {
 
@@ -58,8 +60,11 @@ public class LruMemoryCache implements MemoryCache {
 			throw new NullPointerException("key == null || value == null");
 		}
 
+		//如果map中的key之前就存储value的时候,就把之前的bitmap给删除掉
 		synchronized (this) {
+			//记录每张图片的byte数目
 			size += sizeOf(key, value);
+			//获取key之前存储的value
 			Bitmap previous = map.put(key, value);
 			if (previous != null) {
 				size -= sizeOf(key, previous);
@@ -84,10 +89,12 @@ public class LruMemoryCache implements MemoryCache {
 					throw new IllegalStateException(getClass().getName() + ".sizeOf() is reporting inconsistent results!");
 				}
 
+				//如果当前缓存数目小于maxsize,不做任何处理
 				if (size <= maxSize || map.isEmpty()) {
 					break;
 				}
 
+				//如果当前缓存bitmap总是大于maxsize,删除linkedhashmap的第一个元素,size也要相应减少
 				Map.Entry<String, Bitmap> toEvict = map.entrySet().iterator().next();
 				if (toEvict == null) {
 					break;
