@@ -20,6 +20,7 @@ import java.util.Map;
  * @since 1.8.1
  *
  * 一个限制数量的强引用bitmap的缓存.图片进来先放到队列的头部,当图片添加到存满的缓存中,队列尾部的会被移除.
+ * 强引用
  */
 public class LruMemoryCache implements MemoryCache {
 

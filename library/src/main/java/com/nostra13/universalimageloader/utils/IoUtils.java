@@ -62,7 +62,10 @@ public final class IoUtils {
 	 *                   progress event will be fired after every copied <b>bufferSize</b> bytes
 	 * @return <b>true</b> - if stream copied successfully; <b>false</b> - if copying was interrupted by listener
 	 * @throws IOException
+	 *
+	 * bufferSize小于75%,就可以直接通过os.write来copyStream.
 	 */
+
 	public static boolean copyStream(InputStream is, OutputStream os, CopyListener listener, int bufferSize)
 			throws IOException {
 		int current = 0;
@@ -83,6 +86,7 @@ public final class IoUtils {
 		return true;
 	}
 
+	//如果限制的bufferSize占总文件大小的75%以上,就可以继续loading
 	private static boolean shouldStopLoading(CopyListener listener, int current, int total) {
 		if (listener != null) {
 			boolean shouldContinue = listener.onBytesCopied(current, total);

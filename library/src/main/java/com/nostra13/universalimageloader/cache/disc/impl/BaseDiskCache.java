@@ -106,11 +106,13 @@ public abstract class BaseDiskCache implements DiskCache {
 		try {
 			OutputStream os = new BufferedOutputStream(new FileOutputStream(tmpFile), bufferSize);
 			try {
+				//是否正在加载
 				loaded = IoUtils.copyStream(imageStream, os, listener, bufferSize);
 			} finally {
 				IoUtils.closeSilently(os);
 			}
 		} finally {
+			//renameTo把tmpFile重命名为imageFile,并且代替imageFile
 			if (loaded && !tmpFile.renameTo(imageFile)) {
 				loaded = false;
 			}
@@ -121,6 +123,7 @@ public abstract class BaseDiskCache implements DiskCache {
 		return loaded;
 	}
 
+	//存取图片并且压缩
 	@Override
 	public boolean save(String imageUri, Bitmap bitmap) throws IOException {
 		File imageFile = getFile(imageUri);
