@@ -65,12 +65,15 @@ public class BaseImageDecoder implements ImageDecoder {
 	 * @return Decoded bitmap
 	 * @throws IOException                   if some I/O exception occurs during image reading
 	 * @throws UnsupportedOperationException if image URI has unsupported scheme(protocol)
+	 *
+	 * 根据传进来的stream生产bitmap
 	 */
 	@Override
 	public Bitmap decode(ImageDecodingInfo decodingInfo) throws IOException {
 		Bitmap decodedBitmap;
 		ImageFileInfo imageInfo;
 
+		//根据stream从不同地方去加载图片
 		InputStream imageStream = getImageStream(decodingInfo);
 		if (imageStream == null) {
 			L.e(ERROR_NO_IMAGE_STREAM, decodingInfo.getImageKey());
@@ -78,8 +81,10 @@ public class BaseImageDecoder implements ImageDecoder {
 		}
 		try {
 			imageInfo = defineImageSizeAndRotation(imageStream, decodingInfo);
+			//还原stream,stream游标可能不在头部了,如果读取时继续取,信息可能不完整,所以需要reset一下
 			imageStream = resetStream(imageStream, decodingInfo);
 			Options decodingOptions = prepareDecodingOptions(imageInfo.imageSize, decodingInfo);
+			//通过stream decode出bitmap
 			decodedBitmap = BitmapFactory.decodeStream(imageStream, null, decodingOptions);
 		} finally {
 			IoUtils.closeSilently(imageStream);

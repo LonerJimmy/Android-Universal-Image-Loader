@@ -98,6 +98,18 @@ public abstract class BaseDiskCache implements DiskCache {
 		return getFile(imageUri);
 	}
 
+	/**
+	 *
+	 * @param imageUri    Original image URI
+	 * @param imageStream Input stream of image (shouldn't be closed in this method)
+	 * @param listener    Listener for saving progress, can be ignored if you don't use
+	 *                    {@linkplain com.nostra13.universalimageloader.core.listener.ImageLoadingProgressListener
+	 *                    progress listener} in ImageLoader calls
+	 * @return
+     * @throws IOException
+	 *
+	 * 从网络获取stream并写入本地.这个url,保证图片在下载完成后,可以从本地中获取图片
+     */
 	@Override
 	public boolean save(String imageUri, InputStream imageStream, IoUtils.CopyListener listener) throws IOException {
 		File imageFile = getFile(imageUri);

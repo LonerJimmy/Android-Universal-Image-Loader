@@ -82,6 +82,8 @@ public class BaseImageDownloader implements ImageDownloader {
 
 	@Override
 	public InputStream getStream(String imageUri, Object extra) throws IOException {
+		//根据不同的HTTP("http"), HTTPS("https"), FILE("file"), CONTENT("content"), ASSETS("assets"), DRAWABLE("drawable"), UNKNOWN("")
+		// 来调用不同的方法
 		switch (Scheme.ofUri(imageUri)) {
 			case HTTP:
 			case HTTPS:
@@ -109,6 +111,9 @@ public class BaseImageDownloader implements ImageDownloader {
 	 * @return {@link InputStream} of image
 	 * @throws IOException if some I/O error occurs during network request or if no InputStream could be created for
 	 *                     URL.
+	 *
+	 * 从网络获取stream
+	 * 调用httpURLConnection获取网络图片,并且获取stream.
 	 */
 	protected InputStream getStreamFromNetwork(String imageUri, Object extra) throws IOException {
 		HttpURLConnection conn = createConnection(imageUri, extra);

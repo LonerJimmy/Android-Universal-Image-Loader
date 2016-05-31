@@ -67,6 +67,7 @@ final class DisplayBitmapTask implements Runnable {
 			listener.onLoadingCancelled(imageUri, imageAware.getWrappedView());
 		} else {
 			L.d(LOG_DISPLAY_IMAGE_IN_IMAGEAWARE, loadedFrom, memoryCacheKey);
+			// 通过设置不同的displayer来显示不同样式的图片
 			displayer.display(bitmap, imageAware, loadedFrom);
 			engine.cancelDisplayTaskFor(imageAware);
 			listener.onLoadingComplete(imageUri, imageAware.getWrappedView(), bitmap);

@@ -244,45 +244,63 @@ public class ImageLoader {
 			options = configuration.defaultDisplayImageOptions;
 		}
 
+		//给了一个空的URL的情况
 		if (TextUtils.isEmpty(uri)) {
 			engine.cancelDisplayTaskFor(imageAware);
+			//回调下载开始
 			listener.onLoadingStarted(uri, imageAware.getWrappedView());
 			if (options.shouldShowImageForEmptyUri()) {
 				imageAware.setImageDrawable(options.getImageForEmptyUri(configuration.resources));
 			} else {
 				imageAware.setImageDrawable(null);
 			}
+			//回调下载完成
 			listener.onLoadingComplete(uri, imageAware.getWrappedView(), null);
 			return;
 		}
 
 		if (targetSize == null) {
+			//封装图片的大小
+			//这里大小根据ImageView来的
 			targetSize = ImageSizeUtils.defineTargetSizeForView(imageAware, configuration.getMaxImageSize());
 		}
+
+		//生成一个缓存用的key
 		String memoryCacheKey = MemoryCacheUtils.generateKey(uri, targetSize);
 		engine.prepareDisplayTaskFor(imageAware, memoryCacheKey);
 
 		listener.onLoadingStarted(uri, imageAware.getWrappedView());
 
+		//从内存中获取图片
 		Bitmap bmp = configuration.memoryCache.get(memoryCacheKey);
+
+		//图片不为空,并且没有被回收
 		if (bmp != null && !bmp.isRecycled()) {
 			L.d(LOG_LOAD_IMAGE_FROM_MEMORY_CACHE, memoryCacheKey);
 
 			if (options.shouldPostProcess()) {
 				ImageLoadingInfo imageLoadingInfo = new ImageLoadingInfo(uri, imageAware, targetSize, memoryCacheKey,
 						options, listener, progressListener, engine.getLockForUri(uri));
+				//处理并显示图片
+				//defineHandler是获取一个handler
+				//new一个主UI线程上的handler
+				//这个作用是:当需要加载进度的时候,在图片显示之前先处理一下图片
 				ProcessAndDisplayImageTask displayTask = new ProcessAndDisplayImageTask(engine, bmp, imageLoadingInfo,
 						defineHandler(options));
 				if (options.isSyncLoading()) {
+					//同步任务
 					displayTask.run();
 				} else {
+					//异步任务
 					engine.submit(displayTask);
 				}
 			} else {
+				//直接显示图片
 				options.getDisplayer().display(bmp, imageAware, LoadedFrom.MEMORY_CACHE);
 				listener.onLoadingComplete(uri, imageAware.getWrappedView(), bmp);
 			}
 		} else {
+			//图片为空或者被回收了
 			if (options.shouldShowImageOnLoading()) {
 				imageAware.setImageDrawable(options.getImageOnLoading(configuration.resources));
 			} else if (options.isResetViewBeforeLoading()) {
@@ -291,6 +309,7 @@ public class ImageLoader {
 
 			ImageLoadingInfo imageLoadingInfo = new ImageLoadingInfo(uri, imageAware, targetSize, memoryCacheKey,
 					options, listener, progressListener, engine.getLockForUri(uri));
+			//展示图片
 			LoadAndDisplayImageTask displayTask = new LoadAndDisplayImageTask(engine, imageLoadingInfo,
 					defineHandler(options));
 			if (options.isSyncLoading()) {

@@ -120,17 +120,21 @@ final class LoadAndDisplayImageTask implements Runnable, IoUtils.CopyListener {
 		if (waitIfPaused()) return;
 		if (delayIfNeed()) return;
 
+		//得到互斥锁
 		ReentrantLock loadFromUriLock = imageLoadingInfo.loadFromUriLock;
 		L.d(LOG_START_DISPLAY_IMAGE_TASK, memoryCacheKey);
 		if (loadFromUriLock.isLocked()) {
 			L.d(LOG_WAITING_FOR_IMAGE_LOADED, memoryCacheKey);
 		}
 
+		//不同线程去加载图片,保证每次线程处理完成之后,其他线程才可以进来进行处理.
+
+		//启动锁
 		loadFromUriLock.lock();
 		Bitmap bmp;
 		try {
 			checkTaskNotActual();
-
+			//从内存中获取图片
 			bmp = configuration.memoryCache.get(memoryCacheKey);
 			if (bmp == null || bmp.isRecycled()) {
 				bmp = tryLoadBitmap();
@@ -147,6 +151,7 @@ final class LoadAndDisplayImageTask implements Runnable, IoUtils.CopyListener {
 					}
 				}
 
+				//缓存到内存中
 				if (bmp != null && options.isCacheInMemory()) {
 					L.d(LOG_CACHE_IMAGE_IN_MEMORY, memoryCacheKey);
 					configuration.memoryCache.put(memoryCacheKey, bmp);
@@ -169,9 +174,11 @@ final class LoadAndDisplayImageTask implements Runnable, IoUtils.CopyListener {
 			fireCancelEvent();
 			return;
 		} finally {
+			//释放锁
 			loadFromUriLock.unlock();
 		}
 
+		//最终执行了DisplayBitmapTask,获取最后的bitmap显示到界面上
 		DisplayBitmapTask displayBitmapTask = new DisplayBitmapTask(bmp, imageLoadingInfo, engine, loadedFrom);
 		runTask(displayBitmapTask, syncLoading, handler, engine);
 	}
@@ -211,15 +218,24 @@ final class LoadAndDisplayImageTask implements Runnable, IoUtils.CopyListener {
 		return false;
 	}
 
+	/**
+	 *
+	 * @return
+	 * @throws TaskCancelledException
+	 *
+	 * 判断磁盘是否存在图片,如果存在,直接从磁盘加载图片,如果本地没有,就要从网络获取照片
+     */
 	private Bitmap tryLoadBitmap() throws TaskCancelledException {
 		Bitmap bitmap = null;
 		try {
+			//从磁盘缓存中获取图片
 			File imageFile = configuration.diskCache.get(uri);
 			if (imageFile != null && imageFile.exists() && imageFile.length() > 0) {
 				L.d(LOG_LOAD_IMAGE_FROM_DISK_CACHE, memoryCacheKey);
 				loadedFrom = LoadedFrom.DISC_CACHE;
 
 				checkTaskNotActual();
+				//从磁盘中加载图片
 				bitmap = decodeImage(Scheme.FILE.wrap(imageFile.getAbsolutePath()));
 			}
 			if (bitmap == null || bitmap.getWidth() <= 0 || bitmap.getHeight() <= 0) {
@@ -227,14 +243,20 @@ final class LoadAndDisplayImageTask implements Runnable, IoUtils.CopyListener {
 				loadedFrom = LoadedFrom.NETWORK;
 
 				String imageUriForDecoding = uri;
+				//将图片缓存到磁盘
+				//trycacheiamgeondisk去加载网络照片
 				if (options.isCacheOnDisk() && tryCacheImageOnDisk()) {
 					imageFile = configuration.diskCache.get(uri);
 					if (imageFile != null) {
+						//将url替换成图片在本地磁盘地址
 						imageUriForDecoding = Scheme.FILE.wrap(imageFile.getAbsolutePath());
 					}
 				}
 
 				checkTaskNotActual();
+				// 如果上面允许缓存， 则在上面就加载了图片
+				// 并且将imageUriForDecoding替换成了本地uri
+				// 否则这里是去加载网络图片
 				bitmap = decodeImage(imageUriForDecoding);
 
 				if (bitmap == null || bitmap.getWidth() <= 0 || bitmap.getHeight() <= 0) {
@@ -258,14 +280,21 @@ final class LoadAndDisplayImageTask implements Runnable, IoUtils.CopyListener {
 		return bitmap;
 	}
 
+	//图片已经从网络下载到本地了.
 	private Bitmap decodeImage(String imageUri) throws IOException {
 		ViewScaleType viewScaleType = imageAware.getScaleType();
 		ImageDecodingInfo decodingInfo = new ImageDecodingInfo(memoryCacheKey, imageUri, uri, targetSize, viewScaleType,
 				getDownloader(), options);
+		//decode实现,看一波BaseImageDecocder
 		return decoder.decode(decodingInfo);
 	}
 
-	/** @return <b>true</b> - if image was downloaded successfully; <b>false</b> - otherwise */
+	/**
+	 * @return <b>true</b> - if image was downloaded successfully;
+	 * <b>false</b>
+	 * otherwise
+	 */
+
 	private boolean tryCacheImageOnDisk() throws TaskCancelledException {
 		L.d(LOG_CACHE_IMAGE_ON_DISK, memoryCacheKey);
 
@@ -288,12 +317,15 @@ final class LoadAndDisplayImageTask implements Runnable, IoUtils.CopyListener {
 	}
 
 	private boolean downloadImage() throws IOException {
+		//从Downloader中获取一个stream
+		//imagedownloader,看一波BaseImageDownLoader
 		InputStream is = getDownloader().getStream(uri, options.getExtraForDownloader());
 		if (is == null) {
 			L.e(ERROR_NO_IMAGE_STREAM, memoryCacheKey);
 			return false;
 		} else {
 			try {
+				//BaseDiskCache.save方法
 				return configuration.diskCache.save(uri, is, this);
 			} finally {
 				IoUtils.closeSilently(is);
