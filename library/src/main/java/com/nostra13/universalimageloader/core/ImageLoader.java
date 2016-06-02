@@ -230,6 +230,8 @@ public class ImageLoader {
 	 *                         this listener work.
 	 * @throws IllegalStateException    if {@link #init(ImageLoaderConfiguration)} method wasn't called before
 	 * @throws IllegalArgumentException if passed <b>imageAware</b> is null
+	 *
+	 * 异步加载加载并显示图片到ImageAware上
 	 */
 	public void displayImage(String uri, ImageAware imageAware, DisplayImageOptions options,
 			ImageSize targetSize, ImageLoadingListener listener, ImageLoadingProgressListener progressListener) {
@@ -532,6 +534,8 @@ public class ImageLoader {
 	 *                         {@linkplain com.nostra13.universalimageloader.core.DisplayImageOptions options} to make
 	 *                         this listener work.
 	 * @throws IllegalStateException if {@link #init(ImageLoaderConfiguration)} method wasn't called before
+	 *
+	 * 异步加载图片
 	 */
 	public void loadImage(String uri, ImageSize targetImageSize, DisplayImageOptions options,
 			ImageLoadingListener listener, ImageLoadingProgressListener progressListener) {
@@ -610,6 +614,8 @@ public class ImageLoader {
 	 *                        from configuration} will be used.
 	 * @return Result image Bitmap. Can be <b>null</b> if image loading/decoding was failed or cancelled.
 	 * @throws IllegalStateException if {@link #init(ImageLoaderConfiguration)} method wasn't called before
+	 *
+	 * 同步加载图片
 	 */
 	public Bitmap loadImageSync(String uri, ImageSize targetImageSize, DisplayImageOptions options) {
 		if (options == null) {

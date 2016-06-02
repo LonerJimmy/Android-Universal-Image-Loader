@@ -57,7 +57,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class DefaultConfigurationFactory {
 
-	/** Creates default implementation of task executor */
+	/** Creates default implementation of task executor
+	 *
+	 * 创建线程池,threadPoolSize核心池大小,threadPriority线程优先级,tasksProcessingType线程队列类型
+	 *
+	 * * */
 	public static Executor createExecutor(int threadPoolSize, int threadPriority,
 			QueueProcessingType tasksProcessingType) {
 		boolean lifo = tasksProcessingType == QueueProcessingType.LIFO;
@@ -67,7 +71,11 @@ public class DefaultConfigurationFactory {
 				createThreadFactory(threadPriority, "uil-pool-"));
 	}
 
-	/** Creates default implementation of task distributor */
+	/** Creates default implementation of task distributor
+	 *
+	 * 为ImageLoaderEngine中的任务分发器taskDistributor提供normal优先级和无并发限制的线程池
+	 *
+	 * */
 	public static Executor createTaskDistributor() {
 		return Executors.newCachedThreadPool(createThreadFactory(Thread.NORM_PRIORITY, "uil-pool-d-"));
 	}
@@ -79,6 +87,9 @@ public class DefaultConfigurationFactory {
 
 	/**
 	 * Creates default implementation of {@link DiskCache} depends on incoming parameters
+	 *
+	 * 创建一个 Disk Cache。如果 diskCacheSize 或者 diskCacheFileCount 大于 0，返回一个LruDiskCache，否则返回无大小限制的UnlimitedDiskCache。
+	 *
 	 */
 	public static DiskCache createDiskCache(Context context, FileNameGenerator diskCacheFileNameGenerator,
 			long diskCacheSize, int diskCacheFileCount) {
@@ -110,6 +121,10 @@ public class DefaultConfigurationFactory {
 	/**
 	 * Creates default implementation of {@link MemoryCache} - {@link LruMemoryCache}<br />
 	 * Default cache size = 1/8 of available app memory.
+	 *
+	 * 创建一个 Memory Cache。返回一个LruMemoryCache，若 memoryCacheSize 为 0，则设置该内存缓存的最大字节数为 App 最大可用内存的 1/8。
+	 * 这里 App 的最大可用内存也支持系统在ApiLevel >= 11 application 中android:largeHeap="true"的设置。
+	 *
 	 */
 	public static MemoryCache createMemoryCache(Context context, int memoryCacheSize) {
 		if (memoryCacheSize == 0) {

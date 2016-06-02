@@ -51,28 +51,47 @@ public final class ImageLoaderConfiguration {
 
 	final Resources resources;
 
+	//内存缓存图片的最大宽度
 	final int maxImageWidthForMemoryCache;
+	//内存缓存图片的最大高度
 	final int maxImageHeightForMemoryCache;
+	//硬盘缓存最大图片的宽度
 	final int maxImageWidthForDiskCache;
+	//硬盘缓存最大图片的高度
 	final int maxImageHeightForDiskCache;
+	//用于处理从磁盘缓存中读取的图片
 	final BitmapProcessor processorForDiskCache;
 
+	//ImageLoaderEngine中用于执行获取图片任务的Executor
 	final Executor taskExecutor;
+	//ImageLoaderEngine中用于执行从缓存获取图片任务的Executor
 	final Executor taskExecutorForCachedImages;
+	//用户是否自定义上面的taskExecutor
 	final boolean customExecutor;
+	//用户是否自定义上面的taskExecutorForCachedImages
 	final boolean customExecutorForCachedImages;
 
+	//上面两个excutor的线程池大小
 	final int threadPoolSize;
+	//上面两个excutor的优先级
 	final int threadPriority;
+	//上面两个excutor的线程队列类型,FIFO,LIFO两种类型
 	final QueueProcessingType tasksProcessingType;
 
+	//图片内存缓存
 	final MemoryCache memoryCache;
+	//图片硬盘缓存
 	final DiskCache diskCache;
+	//图片下载器
 	final ImageDownloader downloader;
+	//图片解码
 	final ImageDecoder decoder;
+	//图片显示的配置
 	final DisplayImageOptions defaultDisplayImageOptions;
 
+	//网络不允许情况图片下载
 	final ImageDownloader networkDeniedDownloader;
+	//网络慢情况下图片下载
 	final ImageDownloader slowNetworkDownloader;
 
 	private ImageLoaderConfiguration(final Builder builder) {
@@ -145,6 +164,8 @@ public final class ImageLoaderConfiguration {
 	 * Builder for {@link ImageLoaderConfiguration}
 	 *
 	 * @author Sergey Tarasevich (nostra13[at]gmail[dot]com)
+	 *
+	 * 静态内部类
 	 */
 	public static class Builder {
 
@@ -560,6 +581,7 @@ public final class ImageLoaderConfiguration {
 			return new ImageLoaderConfiguration(this);
 		}
 
+		//没有配置相关项,会返回一个默认值当配置
 		private void initEmptyFieldsWithDefaultValues() {
 			if (taskExecutor == null) {
 				taskExecutor = DefaultConfigurationFactory
@@ -573,6 +595,11 @@ public final class ImageLoaderConfiguration {
 			} else {
 				customExecutorForCachedImages = true;
 			}
+
+			//diskCacheSize和diskCacheFileCount中有一个大于0,默认为LruDiskCache,否则使用无大小限制的UnlimitedDiskCache
+			//其中diskCacheSize,设置磁盘缓存的最大字节数
+			//其中diskCacheFileCount,设置磁盘缓存文件夹下的最大文件数
+			//diskCacheFileNameGenerator默认是HashCodeFileGenerator
 			if (diskCache == null) {
 				if (diskCacheFileNameGenerator == null) {
 					diskCacheFileNameGenerator = DefaultConfigurationFactory.createFileNameGenerator();
@@ -580,9 +607,13 @@ public final class ImageLoaderConfiguration {
 				diskCache = DefaultConfigurationFactory
 						.createDiskCache(context, diskCacheFileNameGenerator, diskCacheSize, diskCacheFileCount);
 			}
+
+			//memoryCache默认是LruMemoryCache
 			if (memoryCache == null) {
 				memoryCache = DefaultConfigurationFactory.createMemoryCache(context, memoryCacheSize);
 			}
+
+			//denyCacheImageMultipleSizesInMemory设置内存缓存不允许缓存一张图片的多个尺寸,默认允许
 			if (denyCacheImageMultipleSizesInMemory) {
 				memoryCache = new FuzzyKeyMemoryCache(memoryCache, MemoryCacheUtils.createFuzzyKeyComparator());
 			}
@@ -604,6 +635,9 @@ public final class ImageLoaderConfiguration {
 	 *
 	 * @author Sergey Tarasevich (nostra13[at]gmail[dot]com)
 	 * @since 1.8.0
+	 *
+	 * 不允许冯文网络的图片下载,继承ImageDownloader接口,在getstream函数中禁止http和https,禁止网络访问.
+	 *
 	 */
 	private static class NetworkDeniedImageDownloader implements ImageDownloader {
 
@@ -631,6 +665,9 @@ public final class ImageLoaderConfiguration {
 	 *
 	 * @author Sergey Tarasevich (nostra13[at]gmail[dot]com)
 	 * @since 1.8.1
+	 *
+	 * 网络慢的情况下的图片下载器,在http和https时,用FlushedInputStream代替inputStream处理网络慢的情况
+	 *
 	 */
 	private static class SlowNetworkImageDownloader implements ImageDownloader {
 

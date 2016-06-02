@@ -48,6 +48,8 @@ import java.net.URLConnection;
  *
  * @author Sergey Tarasevich (nostra13[at]gmail[dot]com)
  * @since 1.8.0
+ *
+ * 将url的图片转化stream
  */
 public class BaseImageDownloader implements ImageDownloader {
 	/** {@value} */
