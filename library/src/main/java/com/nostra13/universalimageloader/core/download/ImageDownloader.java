@@ -38,6 +38,11 @@ public interface ImageDownloader {
 	 * @return {@link InputStream} of image
 	 * @throws IOException                   if some I/O error occurs during getting image stream
 	 * @throws UnsupportedOperationException if image URI has unsupported scheme(protocol)
+	 *
+	 * 图片下载接口.
+	 * 表示通过uri得到inputStream.
+	 * 通过内部定义的枚举Scheme,支持的图片来源.
+	 *
 	 */
 	InputStream getStream(String imageUri, Object extra) throws IOException;
 

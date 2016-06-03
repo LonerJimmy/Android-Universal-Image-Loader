@@ -57,6 +57,11 @@ final class DisplayBitmapTask implements Runnable {
 		this.loadedFrom = loadedFrom;
 	}
 
+	/**
+	 * 首先判断ImageAware是否被GC回收,如果是直接调用取消加载回调接口ImageLoadingListener.onLoadingCancelled(…)；
+	 * 否则判断是否ImageAware是否被复用,如果是直接调用取消加载回调接口ImageLoadingListener.onLoadingCancelled(…)；
+	 * 否则调用display显示图片,并将ImageAware从正在加载的map中移除.调用加载成功回调接口ImageLoadingListener.onLoadingComplete(…)。
+	 **/
 	@Override
 	public void run() {
 		if (imageAware.isCollected()) {

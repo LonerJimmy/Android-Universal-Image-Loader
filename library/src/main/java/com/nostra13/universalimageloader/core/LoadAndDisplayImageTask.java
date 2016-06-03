@@ -115,6 +115,12 @@ final class LoadAndDisplayImageTask implements Runnable, IoUtils.CopyListener {
 		syncLoading = options.isSyncLoading();
 	}
 
+	/**
+	 * 从内存缓存中读取bitmap对象,若不存在,调用tryLoadBitmap()函数获取bitmap对象,获取成功,如果options.isCacheInMemory()为true,将bitmap对象缓存到内存中.
+	 * 最后在DisplayBitmapTask显示图片,
+	 * DisplayBitmapTask displayBitmapTask = new DisplayBitmapTask(bmp, imageLoadingInfo, engine, loadedFrom);
+	 * runTask(displayBitmapTask, syncLoading, handler, engine);
+	 */
 	@Override
 	public void run() {
 		if (waitIfPaused()) return;
@@ -293,6 +299,9 @@ final class LoadAndDisplayImageTask implements Runnable, IoUtils.CopyListener {
 	 * @return <b>true</b> - if image was downloaded successfully;
 	 * <b>false</b>
 	 * otherwise
+	 *
+	 * 下载图片并存储在磁盘内，根据磁盘缓存图片最长宽高的配置处理图片。
+	 *
 	 */
 
 	private boolean tryCacheImageOnDisk() throws TaskCancelledException {
@@ -300,6 +309,7 @@ final class LoadAndDisplayImageTask implements Runnable, IoUtils.CopyListener {
 
 		boolean loaded;
 		try {
+			//调用下载器下载并保存图片
 			loaded = downloadImage();
 			if (loaded) {
 				int width = configuration.maxImageWidthForDiskCache;
@@ -316,6 +326,7 @@ final class LoadAndDisplayImageTask implements Runnable, IoUtils.CopyListener {
 		return loaded;
 	}
 
+	//下载图片并存储在磁盘内
 	private boolean downloadImage() throws IOException {
 		//从Downloader中获取一个stream
 		//imagedownloader,看一波BaseImageDownLoader
@@ -406,6 +417,12 @@ final class LoadAndDisplayImageTask implements Runnable, IoUtils.CopyListener {
 		runTask(r, false, handler, engine);
 	}
 
+	/**
+	 * 根据ImageLoaderEngine配置得到下载器。
+	 * 如果不允许访问网络，则使用不允许访问网络的图片下载器NetworkDeniedImageDownloader；
+	 * 如果是慢网络情况，则使用慢网络情况下的图片下载器SlowNetworkImageDownloader；
+	 * 否则直接使用ImageLoaderConfiguration中的downloader。
+	 **/
 	private ImageDownloader getDownloader() {
 		ImageDownloader d;
 		if (engine.isNetworkDenied()) {
@@ -459,7 +476,11 @@ final class LoadAndDisplayImageTask implements Runnable, IoUtils.CopyListener {
 		}
 	}
 
-	/** @return <b>true</b> - if current ImageAware is reused for displaying another image; <b>false</b> - otherwise */
+	/** @return <b>true</b> - if current ImageAware is reused for displaying another image; <b>false</b> - otherwise
+	 *
+	 * 判断ImageAware是否被复用
+	 *
+	 * */
 	private boolean isViewReused() {
 		String currentCacheKey = engine.getLoadingUriForView(imageAware);
 		// Check whether memory cache key (image URI) for current ImageAware is actual.

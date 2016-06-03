@@ -34,13 +34,21 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 final class ImageLoadingInfo {
 
+	//图片url
 	final String uri;
+	//图片缓存key
 	final String memoryCacheKey;
+	//需要加载图片的对象
 	final ImageAware imageAware;
+	//图片的显示尺寸
 	final ImageSize targetSize;
+	//图片显示的配置项
 	final DisplayImageOptions options;
+	//图片加载各种时刻的回调接口
 	final ImageLoadingListener listener;
+	//图片加载进度的回调接口
 	final ImageLoadingProgressListener progressListener;
+	//图片加载中的重入锁
 	final ReentrantLock loadFromUriLock;
 
 	public ImageLoadingInfo(String uri, ImageAware imageAware, ImageSize targetSize, String memoryCacheKey,

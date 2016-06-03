@@ -65,6 +65,13 @@ public abstract class ViewAware implements ImageAware {
 	 *                            it's recommended 'android:layout_width' and 'android:layout_height' (or
 	 *                            'android:maxWidth' and 'android:maxHeight') are set with concrete values. It helps to
 	 *                            save memory.
+	 *
+	 * checkActualViewSize表示通过getWidth()和getHeight()获取图片宽高是真实的宽高还是LayoutParams的宽高,当checkActualViewSize=true的时候,返回的是真实的宽高
+	 * 如果为true会导致一个问题，View在还没有初始化完成时加载图片，这时它的真实宽高为 0，会取它LayoutParams的宽高，
+	 * 而图片缓存的 key 与这个宽高有关，所以当View初始化完成再次需要加载该图片时，getWidth()和getHeight()返回的宽高都已经变化，
+	 * 缓存 key 不一样，从而导致缓存命中失败会再次从网络下载一次图片。
+	 * 可通过ImageLoaderConfiguration.Builder.denyCacheImageMultipleSizesInMemory()设置不允许内存缓存缓存一张图片的多个尺寸。
+	 *
 	 */
 	public ViewAware(View view, boolean checkActualViewSize) {
 		if (view == null) throw new IllegalArgumentException("view must not be null");
@@ -142,6 +149,7 @@ public abstract class ViewAware implements ImageAware {
 		return view == null ? super.hashCode() : view.hashCode();
 	}
 
+	//如果当前操作在主线程中,并且view没有被回收,就会调用setImageDrawableInto函数
 	@Override
 	public boolean setImageDrawable(Drawable drawable) {
 		if (Looper.myLooper() == Looper.getMainLooper()) {

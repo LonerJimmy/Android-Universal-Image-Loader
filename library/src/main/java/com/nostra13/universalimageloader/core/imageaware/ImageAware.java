@@ -81,6 +81,9 @@ public interface ImageAware {
 	 * <p/>
 	 * It's reasonable to return hash code of wrapped view (if any) to prevent displaying non-actual images in view
 	 * because of view re-using.
+	 *
+	 * 得到唯一标识id.ImageLoaderEngine中用这个id标识正在加载图片的ImageAware和图片内存缓存中key的对应关系,如果不相等,之前的图片请求就会被取消.
+	 *
 	 */
 	int getId();
 

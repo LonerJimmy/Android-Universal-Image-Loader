@@ -69,6 +69,9 @@ public class ImageViewAware extends ViewAware {
 	 * {@inheritDoc}
 	 * <br />
 	 * 3) Get <b>maxWidth</b>.
+	 *
+	 * 如果getWidth<=0,利用反射获取mMaxWidth的值作为宽
+	 *
 	 */
 	@Override
 	public int getWidth() {
@@ -86,6 +89,9 @@ public class ImageViewAware extends ViewAware {
 	 * {@inheritDoc}
 	 * <br />
 	 * 3) Get <b>maxHeight</b>
+	 *
+	 * 如果getHeight<=0,利用反射获取mMaxHeight的值作为高
+	 *
 	 */
 	@Override
 	public int getHeight() {

@@ -64,24 +64,38 @@ import com.nostra13.universalimageloader.core.process.BitmapProcessor;
  */
 public final class DisplayImageOptions {
 
+	//imageResOnLoading表示正在加载中的图片resource id,imageResForEmptyUri表示空uri时图片的resource id,imageResOnFail表示加载失败时的图片的resource id.
+	//优先级imageResOnLoading > imageResForEmptyUri > imageResOnFail
 	private final int imageResOnLoading;
 	private final int imageResForEmptyUri;
 	private final int imageResOnFail;
+	//加载中的图片的drawable对象,默认为null
 	private final Drawable imageOnLoading;
+	//空uri时图片的drawable对象,默认是null
 	private final Drawable imageForEmptyUri;
+	//加载失败的时候drawable对象,默认是null
 	private final Drawable imageOnFail;
+	//加载前是否重置view,默认是false
 	private final boolean resetViewBeforeLoading;
+	//是否缓存在内存中,默认是false
 	private final boolean cacheInMemory;
+	//是否换在硬盘中,默认是false
 	private final boolean cacheOnDisk;
+	//图片缩放类型,默认为IN_SAMPLE_POWER_OF_2
 	private final ImageScaleType imageScaleType;
 	private final Options decodingOptions;
+	//设置在开始加载前的延迟时间,单位为毫秒,默认是0
 	private final int delayBeforeLoading;
 	private final boolean considerExifParams;
 	private final Object extraForDownloader;
+	//缓存在内存之前的处理程序,默认为null
 	private final BitmapProcessor preProcessor;
+	//缓存在内存之后的处理程序,默认为null
 	private final BitmapProcessor postProcessor;
+	//图片显示方式
 	private final BitmapDisplayer displayer;
 	private final Handler handler;
+	//是否同步加载
 	private final boolean isSyncLoading;
 
 	private DisplayImageOptions(Builder builder) {
