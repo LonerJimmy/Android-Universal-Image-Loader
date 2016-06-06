@@ -98,6 +98,7 @@ public class UsingFreqLimitedMemoryCache extends LimitedMemoryCache {
 		Bitmap leastUsedValue = null;
 		Set<Entry<Bitmap, Integer>> entries = usingCounts.entrySet();
 		synchronized (usingCounts) {
+			//删除ß使用次数最少的的元素
 			for (Entry<Bitmap, Integer> entry : entries) {
 				if (leastUsedValue == null) {
 					leastUsedValue = entry.getKey();

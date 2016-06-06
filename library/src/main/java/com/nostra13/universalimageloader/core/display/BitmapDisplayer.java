@@ -38,6 +38,9 @@ public interface BitmapDisplayer {
 	 * @param imageAware {@linkplain com.nostra13.universalimageloader.core.imageaware.ImageAware Image aware view} to
 	 *                   display Bitmap
 	 * @param loadedFrom Source of loaded image
+	 *
+	 * 在ImageAware中显示bitmap对象的接口.可以实现对bitmap做一些额外处理,例如圆角\动画等效果
+	 *
 	 */
 	void display(Bitmap bitmap, ImageAware imageAware, LoadedFrom loadedFrom);
 }

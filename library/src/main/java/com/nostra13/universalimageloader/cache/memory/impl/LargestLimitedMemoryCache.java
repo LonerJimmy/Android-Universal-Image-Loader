@@ -85,6 +85,7 @@ public class LargestLimitedMemoryCache extends LimitedMemoryCache {
 		Bitmap largestValue = null;
 		Set<Entry<Bitmap, Integer>> entries = valueSizes.entrySet();
 		synchronized (valueSizes) {
+			//删除size最大的元素
 			for (Entry<Bitmap, Integer> entry : entries) {
 				if (largestValue == null) {
 					largestValue = entry.getKey();

@@ -33,18 +33,27 @@ import com.nostra13.universalimageloader.core.download.ImageDownloader;
  */
 public class ImageDecodingInfo {
 
+	//图片
 	private final String imageKey;
+	//图片uri
 	private final String imageUri;
+	//原始图片uri
 	private final String originalImageUri;
+	//图片显示尺寸
 	private final ImageSize targetSize;
 
+	//图片ScaleType
 	private final ImageScaleType imageScaleType;
 	private final ViewScaleType viewScaleType;
 
+	//图片下载器
 	private final ImageDownloader downloader;
+	//下载器需要的辅助信息
 	private final Object extraForDownloader;
 
+	//是否需要Exif信息
 	private final boolean considerExifParams;
+	//图片解码信息
 	private final Options decodingOptions;
 
 	public ImageDecodingInfo(String imageKey, String imageUri, String originalImageUri, ImageSize targetSize, ViewScaleType viewScaleType,

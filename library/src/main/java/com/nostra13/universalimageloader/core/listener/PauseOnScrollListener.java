@@ -35,7 +35,9 @@ public class PauseOnScrollListener implements OnScrollListener {
 
 	private ImageLoader imageLoader;
 
+	//触摸滑动的过程中是否暂停图片加载
 	private final boolean pauseOnScroll;
+	//甩指滑动过程中是否暂停图片加载
 	private final boolean pauseOnFling;
 	private final OnScrollListener externalListener;
 

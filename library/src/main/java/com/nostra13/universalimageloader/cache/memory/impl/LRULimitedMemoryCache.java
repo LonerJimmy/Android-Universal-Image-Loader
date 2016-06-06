@@ -82,6 +82,16 @@ public class LRULimitedMemoryCache extends LimitedMemoryCache {
 		return value.getRowBytes() * value.getHeight();
 	}
 
+	/**
+	 *
+	 * 通过new LinkedHashMap<String, Bitmap>(10, 1.1f, true)作为缓存池。
+	 * LinkedHashMap 第三个参数表示是否需要根据访问顺序(accessOrder)排序，
+	 * true 表示根据accessOrder排序，最近访问的跟最新加入的一样放到最后面，
+	 * false 表示根据插入顺序排序。这里为 true 且缓存满时始终删除第一个元素，即始终删除最近最少访问的元素。
+	 * 实现了LimitedMemoryCache缓存removeNext()函数，总是返回第一个元素，即最近最少使用的元素。
+	 *
+	 * @return
+     */
 	@Override
 	protected Bitmap removeNext() {
 		Bitmap mostLongUsedValue = null;

@@ -136,6 +136,7 @@ public abstract class BaseDiskCache implements DiskCache {
 	}
 
 	//存取图片并且压缩
+	//通过Bitmap.compress(…)函数将bitmap先写入与目标文件同一文件夹的 .tmp 结尾的临时文件内，若写入成功则将临时文件重命名为目标文件并返回 true，否则删除临时文件并返回 false。
 	@Override
 	public boolean save(String imageUri, Bitmap bitmap) throws IOException {
 		File imageFile = getFile(imageUri);
@@ -178,6 +179,9 @@ public abstract class BaseDiskCache implements DiskCache {
 	}
 
 	/** Returns file object (not null) for incoming image URI. File object can reference to non-existing file. */
+	/**
+	 * 根据imageUri和fileNameGenerator得到的文件名,返回cacheDir内该文件,如果不存在,使用备用reserveCacheDir
+	 **/
 	protected File getFile(String imageUri) {
 		String fileName = fileNameGenerator.generate(imageUri);
 		File dir = cacheDir;

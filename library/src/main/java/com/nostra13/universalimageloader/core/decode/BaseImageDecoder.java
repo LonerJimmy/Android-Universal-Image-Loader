@@ -103,6 +103,7 @@ public class BaseImageDecoder implements ImageDecoder {
 		return decodingInfo.getDownloader().getStream(decodingInfo.getImageUri(), decodingInfo.getExtraForDownloader());
 	}
 
+	//得到图片信息真实大小
 	protected ImageFileInfo defineImageSizeAndRotation(InputStream imageStream, ImageDecodingInfo decodingInfo)
 			throws IOException {
 		Options options = new Options();
@@ -157,6 +158,7 @@ public class BaseImageDecoder implements ImageDecoder {
 		return new ExifInfo(rotation, flip);
 	}
 
+	//得到图片缩放比例
 	protected Options prepareDecodingOptions(ImageSize imageSize, ImageDecodingInfo decodingInfo) {
 		ImageScaleType scaleType = decodingInfo.getImageScaleType();
 		int scale;
@@ -165,10 +167,12 @@ public class BaseImageDecoder implements ImageDecoder {
 		} else if (scaleType == ImageScaleType.NONE_SAFE) {
 			scale = ImageSizeUtils.computeMinImageSampleSize(imageSize);
 		} else {
+			//如果scaleType等于ImageScaleType.IN_SAMPLE_POWER_OF_2,缩放比例从1开始不断*2知道宽和高都小于最大尺寸
 			ImageSize targetSize = decodingInfo.getTargetSize();
 			boolean powerOf2 = scaleType == ImageScaleType.IN_SAMPLE_POWER_OF_2;
 			scale = ImageSizeUtils.computeImageSampleSize(imageSize, targetSize, decodingInfo.getViewScaleType(), powerOf2);
 		}
+		//判断宽和高是否超过最大值
 		if (scale > 1 && loggingEnabled) {
 			L.d(LOG_SUBSAMPLE_IMAGE, imageSize, imageSize.scaleDown(scale), scale, decodingInfo.getImageKey());
 		}
@@ -190,6 +194,7 @@ public class BaseImageDecoder implements ImageDecoder {
 		return getImageStream(decodingInfo);
 	}
 
+	//根据参数将图片放大\翻转\旋转为合适的样子返回
 	protected Bitmap considerExactScaleAndOrientatiton(Bitmap subsampledBitmap, ImageDecodingInfo decodingInfo,
 			int rotation, boolean flipHorizontal) {
 		Matrix m = new Matrix();

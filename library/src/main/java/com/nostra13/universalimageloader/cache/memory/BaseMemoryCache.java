@@ -30,6 +30,7 @@ import java.util.*;
 public abstract class BaseMemoryCache implements MemoryCache {
 
 	/** Stores not strong references to objects */
+	//弱引用的map,利于内存不足时回收缓存对象
 	private final Map<String, Reference<Bitmap>> softMap = Collections.synchronizedMap(new HashMap<String, Reference<Bitmap>>());
 
 	@Override
@@ -67,5 +68,6 @@ public abstract class BaseMemoryCache implements MemoryCache {
 	}
 
 	/** Creates {@linkplain Reference not strong} reference of value */
+	//根据bitmap创建refrence作为缓存对象
 	protected abstract Reference<Bitmap> createReference(Bitmap value);
 }

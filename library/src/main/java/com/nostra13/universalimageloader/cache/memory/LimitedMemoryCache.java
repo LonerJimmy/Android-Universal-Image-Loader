@@ -68,9 +68,10 @@ public abstract class LimitedMemoryCache extends BaseMemoryCache {
 		int sizeLimit = getSizeLimit();
 		int curCacheSize = cacheSize.get();
 		if (valueSize < sizeLimit) {
+			//判断大小是否超出上限,超出上限,循环删除对象,直到小于上限.
 			while (curCacheSize + valueSize > sizeLimit) {
 				Bitmap removedValue = removeNext();
-				if (hardCache.remove(removedValue)) {
+					if (hardCache.remove(removedValue)) {
 					curCacheSize = cacheSize.addAndGet(-getSize(removedValue));
 				}
 			}

@@ -178,6 +178,10 @@ public class BaseImageDownloader implements ImageDownloader {
 	 *                 DisplayImageOptions.extraForDownloader(Object)}; can be null
 	 * @return {@link InputStream} of image
 	 * @throws IOException if some I/O error occurs reading from file system
+	 *
+	 * 从文件系统获取图片的InputStream。如果 uri 是 video 类型，
+	 * 则需要单独得到 video 的缩略图返回，否则按照一般读取文件操作返回。
+	 *
 	 */
 	protected InputStream getStreamFromFile(String imageUri, Object extra) throws IOException {
 		String filePath = Scheme.FILE.crop(imageUri);
@@ -211,6 +215,11 @@ public class BaseImageDownloader implements ImageDownloader {
 	 *                 DisplayImageOptions.extraForDownloader(Object)}; can be null
 	 * @return {@link InputStream} of image
 	 * @throws FileNotFoundException if the provided URI could not be opened
+	 *
+	 * 从contentprovider获取inputstream,如果uri是video类型,获取缩略图返回;
+	 * 如果是联系人,通过ContactsContract.Contacts.openContactPhotoInputStream(res, uri)读取内容返回;
+	 * 否则通过getContentResolver().openInputStream来获取
+	 *
 	 */
 	protected InputStream getStreamFromContent(String imageUri, Object extra) throws FileNotFoundException {
 		ContentResolver res = context.getContentResolver();
@@ -250,6 +259,9 @@ public class BaseImageDownloader implements ImageDownloader {
 	 *                 DisplayImageOptions.extraForDownloader(Object)}; can be null
 	 * @return {@link InputStream} of image
 	 * @throws IOException if some I/O error occurs file reading
+	 *
+	 * 从asset获取图片
+	 *
 	 */
 	protected InputStream getStreamFromAssets(String imageUri, Object extra) throws IOException {
 		String filePath = Scheme.ASSETS.crop(imageUri);
@@ -263,6 +275,9 @@ public class BaseImageDownloader implements ImageDownloader {
 	 * @param extra    Auxiliary object which was passed to {@link DisplayImageOptions.Builder#extraForDownloader(Object)
 	 *                 DisplayImageOptions.extraForDownloader(Object)}; can be null
 	 * @return {@link InputStream} of image
+	 *
+	 * 从drawable中获取inputstream
+	 *
 	 */
 	protected InputStream getStreamFromDrawable(String imageUri, Object extra) {
 		String drawableIdString = Scheme.DRAWABLE.crop(imageUri);
@@ -282,6 +297,9 @@ public class BaseImageDownloader implements ImageDownloader {
 	 * @return {@link InputStream} of image
 	 * @throws IOException                   if some I/O error occurs
 	 * @throws UnsupportedOperationException if image URI has unsupported scheme(protocol)
+	 *
+	 * UNKOWN类型,抛出异常
+	 *
 	 */
 	protected InputStream getStreamFromOtherSource(String imageUri, Object extra) throws IOException {
 		throw new UnsupportedOperationException(String.format(ERROR_UNSUPPORTED_SCHEME, imageUri));
